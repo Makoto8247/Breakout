@@ -25,11 +25,16 @@ class Main : PApplet(){
         val BALL_POS = PVector(0f,0f)
         val BALL_VELOCITY = PVector(4f,4f)
         val BALL_R = 20f
-        init {
+        fun init() {
             // 初期位置
             BALL_POS.x = width.toFloat() / 2f
             BALL_POS.y = height.toFloat() / 2f
         }
+
+        fun bounce(){
+            BALL_VELOCITY.y = -1 * Math.abs(BALL_VELOCITY.y)
+        }
+
         fun draw(){
             pushStyle()
             fill(0f,100f,100f)
@@ -49,7 +54,7 @@ class Main : PApplet(){
     inner class Block{
         private val BLOCK_POS = PVector(0f,0f)
         val COLOR = random(1f)
-        val BLOCK_EXI = true
+        var BLOCK_EXI = true
         fun settingPos(x:Float,y:Float){
             BLOCK_POS.x = x
             BLOCK_POS.y = y
@@ -59,7 +64,14 @@ class Main : PApplet(){
             if(BLOCK_EXI) {
                 pushStyle()
                 fill(COLOR, 40f, 100f)
+                rectMode(CENTER)
                 rect(BLOCK_POS.x, BLOCK_POS.y, 50f, 20f)
+                if(Math.abs(BLOCK_POS.y - BALL.BALL_POS.y) <= (BALL.BALL_R / 2f) + 10f
+                    && Math.abs((BLOCK_POS.x + 25f) - (BALL.BALL_POS.x + BALL.BALL_R)) <= 50
+                ){
+                    BLOCK_EXI = false
+                    BALL.BALL_VELOCITY.y *= -1
+                }
                 popStyle()
             }
         }
@@ -77,6 +89,7 @@ class Main : PApplet(){
         frameRate(30f)
         colorMode(HSB,1f,100f,100f)
         PLAYER.PLAYER_POS.y = height.toFloat() - 100f
+        BALL.init()
     }
 
 
@@ -91,11 +104,11 @@ class Main : PApplet(){
         if(Math.abs(PLAYER.PLAYER_POS.y - BALL.BALL_POS.y) <= (BALL.BALL_R / 2f) + 5f
             && Math.abs((PLAYER.PLAYER_POS.x + 25f) - (BALL.BALL_POS.x + BALL.BALL_R)) <= 50
         ){
-            BALL.BALL_VELOCITY.y = -1 * Math.abs(BALL.BALL_VELOCITY.y)
+            BALL.bounce()
         }
         for(i in 0 until BLOCKS.size){
             for(j in 0 until BLOCKS[0].size){
-                BLOCKS[i][j].settingPos(50f * j,20f * i + 10f)
+                BLOCKS[i][j].settingPos(50f * j + 25f,20f * i + 10f)
                 BLOCKS[i][j].draw()
             }
         }
